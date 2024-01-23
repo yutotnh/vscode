@@ -63,7 +63,6 @@ export interface DeleteWordContext {
 export class WordOperations {
 
 	private static _createWord(lineContent: string, wordType: WordType, nextCharClass: WordCharacterClass, start: number, end: number): IFindWordResult {
-		// console.log('WORD ==> ' + start + ' => ' + end + ':::: <<<' + lineContent.substring(start, end) + '>>>');
 		return { start: start, end: end, wordType: wordType, nextCharClass: nextCharClass };
 	}
 
@@ -74,9 +73,26 @@ export class WordOperations {
 
 	private static _doFindPreviousWordOnLine(lineContent: string, wordSeparators: WordCharacterClassifier, position: Position): IFindWordResult | null {
 		let wordType = WordType.None;
+
+		const segmenter = new Intl.Segmenter('en', { granularity: 'word' });
+		const segments = segmenter.segment(lineContent);
+
+		const wordLikeChIndices = [];
+		for (const segment of segments) {
+			if (segment.isWordLike) {
+				wordLikeChIndices.push(segment.index);
+			}
+		}
+
 		for (let chIndex = position.column - 2; chIndex >= 0; chIndex--) {
 			const chCode = lineContent.charCodeAt(chIndex);
 			const chClass = wordSeparators.get(chCode);
+
+			for (const wordLikeChIndex of wordLikeChIndices) {
+				if (chIndex === wordLikeChIndex) {
+					return this._createWord(lineContent, wordType, chClass, chIndex, this._findEndOfWord(lineContent, wordSeparators, wordType, chIndex));
+				}
+			}
 
 			if (chClass === WordCharacterClass.Regular) {
 				if (wordType === WordType.Separator) {
@@ -103,10 +119,26 @@ export class WordOperations {
 	}
 
 	private static _findEndOfWord(lineContent: string, wordSeparators: WordCharacterClassifier, wordType: WordType, startIndex: number): number {
+		const segmenter = new Intl.Segmenter('en', { granularity: 'word' });
+		const segments = segmenter.segment(lineContent);
+
+		const wordLikeChIndices = [];
+		for (const segment of segments) {
+			if (segment.isWordLike) {
+				wordLikeChIndices.push(segment.index + segment.segment.length);
+			}
+		}
+
 		const len = lineContent.length;
 		for (let chIndex = startIndex; chIndex < len; chIndex++) {
 			const chCode = lineContent.charCodeAt(chIndex);
 			const chClass = wordSeparators.get(chCode);
+
+			for (const wordLikeChIndex of wordLikeChIndices) {
+				if (chIndex === wordLikeChIndex) {
+					return chIndex;
+				}
+			}
 
 			if (chClass === WordCharacterClass.Whitespace) {
 				return chIndex;
@@ -130,9 +162,29 @@ export class WordOperations {
 		let wordType = WordType.None;
 		const len = lineContent.length;
 
+		const segmenter = new Intl.Segmenter('en', { granularity: 'word' });
+		const segments = segmenter.segment(lineContent);
+
+		const wordLikeChIndices = [];
+		for (const segment of segments) {
+			if (segment.isWordLike) {
+				wordLikeChIndices.push(segment.index + segment.segment.length);
+			}
+		}
+
 		for (let chIndex = position.column - 1; chIndex < len; chIndex++) {
 			const chCode = lineContent.charCodeAt(chIndex);
 			const chClass = wordSeparators.get(chCode);
+
+			for (let i = 0; i < wordLikeChIndices.length - 1; i++) {
+				if (position.column - 1 === chIndex) {
+					continue;
+				}
+
+				if (chIndex === wordLikeChIndices[i]) {
+					return this._createWord(lineContent, wordType, chClass, this._findStartOfWord(lineContent, wordSeparators, wordType, wordLikeChIndices[i] - 1), wordLikeChIndices[i]);
+				}
+			}
 
 			if (chClass === WordCharacterClass.Regular) {
 				if (wordType === WordType.Separator) {
@@ -159,9 +211,24 @@ export class WordOperations {
 	}
 
 	private static _findStartOfWord(lineContent: string, wordSeparators: WordCharacterClassifier, wordType: WordType, startIndex: number): number {
+		const segmenter = new Intl.Segmenter('en', { granularity: 'word' });
+		const segments = segmenter.segment(lineContent);
+
+		const wordLikeChIndices = [];
+		for (const segment of segments) {
+			if (segment.isWordLike) {
+				wordLikeChIndices.push(segment.index);
+			}
+		}
 		for (let chIndex = startIndex; chIndex >= 0; chIndex--) {
 			const chCode = lineContent.charCodeAt(chIndex);
 			const chClass = wordSeparators.get(chCode);
+
+			for (const wordLikeChIndex of wordLikeChIndices) {
+				if (chIndex === wordLikeChIndex) {
+					return chIndex;
+				}
+			}
 
 			if (chClass === WordCharacterClass.Whitespace) {
 				return chIndex + 1;
