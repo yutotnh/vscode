@@ -161,6 +161,14 @@ export interface IEditorOptions {
 	 */
 	readOnlyMessage?: IMarkdownString;
 	/**
+	 * Locales that recognizes word separators when doing word related navigations or operations.
+	 *
+	 * Specify the BCP 47 language tag of the word you wish to recognize. If you specify more than one, separate them with a space.
+	 * The default setting of "" does not recognize words.
+	 * If "auto" is specified, Use VS Code's configured display language.
+	 */
+	recognizeWordLocales?: string;
+	/**
 	 * Should the textarea used for input use the DOM `readonly` attribute.
 	 * Defaults to false.
 	 */
@@ -5159,6 +5167,7 @@ export const enum EditorOption {
 	quickSuggestionsDelay,
 	readOnly,
 	readOnlyMessage,
+	recognizeWordLocales,
 	renameOnType,
 	renderControlCharacters,
 	renderFinalNewline,
@@ -5697,6 +5706,10 @@ export const EditorOptions = {
 		EditorOption.readOnly, 'readOnly', false,
 	)),
 	readOnlyMessage: register(new ReadonlyMessage()),
+	recognizeWordLocale: register(new EditorStringOption(
+		EditorOption.recognizeWordLocales, 'recognizeWordLocales', USUAL_WORD_SEPARATORS,
+		{ description: nls.localize('recognizeWordLocale', "Locales that recognizes word separators when doing word related navigations or operations.Specify the BCP 47 language tag of the word you wish to recognize. If you specify more than one, separate them with a space. The default setting of \"\" does not recognize words. If \"auto\" is specified, Use VS Code's configured display language.") }
+	)),
 	renameOnType: register(new EditorBooleanOption(
 		EditorOption.renameOnType, 'renameOnType', false,
 		{ description: nls.localize('renameOnType', "Controls whether the editor auto renames on type."), markdownDeprecationMessage: nls.localize('renameOnTypeDeprecate', "Deprecated, use `editor.linkedEditing` instead.") }

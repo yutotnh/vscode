@@ -243,7 +243,7 @@ export class WordOperations {
 		return 0;
 	}
 
-	public static moveWordLeft(wordSeparators: WordCharacterClassifier, model: ICursorSimpleModel, position: Position, wordNavigationType: WordNavigationType): Position {
+	public static moveWordLeft(wordSeparators: WordCharacterClassifier, model: ICursorSimpleModel, position: Position, wordNavigationType: WordNavigationType, locales: string): Position {
 		let lineNumber = position.lineNumber;
 		let column = position.column;
 
@@ -337,7 +337,7 @@ export class WordOperations {
 		return new Position(lineNumber, 1);
 	}
 
-	public static moveWordRight(wordSeparators: WordCharacterClassifier, model: ICursorSimpleModel, position: Position, wordNavigationType: WordNavigationType): Position {
+	public static moveWordRight(wordSeparators: WordCharacterClassifier, model: ICursorSimpleModel, position: Position, wordNavigationType: WordNavigationType, locales: string): Position {
 		let lineNumber = position.lineNumber;
 		let column = position.column;
 
@@ -865,20 +865,20 @@ export class WordPartOperations extends WordOperations {
 		return candidates[0];
 	}
 
-	public static moveWordPartLeft(wordSeparators: WordCharacterClassifier, model: ICursorSimpleModel, position: Position): Position {
+	public static moveWordPartLeft(wordSeparators: WordCharacterClassifier, model: ICursorSimpleModel, position: Position, locales: string): Position {
 		const candidates = enforceDefined([
-			WordOperations.moveWordLeft(wordSeparators, model, position, WordNavigationType.WordStart),
-			WordOperations.moveWordLeft(wordSeparators, model, position, WordNavigationType.WordEnd),
+			WordOperations.moveWordLeft(wordSeparators, model, position, WordNavigationType.WordStart, locales),
+			WordOperations.moveWordLeft(wordSeparators, model, position, WordNavigationType.WordEnd, locales),
 			WordOperations._moveWordPartLeft(model, position)
 		]);
 		candidates.sort(Position.compare);
 		return candidates[2];
 	}
 
-	public static moveWordPartRight(wordSeparators: WordCharacterClassifier, model: ICursorSimpleModel, position: Position): Position {
+	public static moveWordPartRight(wordSeparators: WordCharacterClassifier, model: ICursorSimpleModel, position: Position, locales: string): Position {
 		const candidates = enforceDefined([
-			WordOperations.moveWordRight(wordSeparators, model, position, WordNavigationType.WordStart),
-			WordOperations.moveWordRight(wordSeparators, model, position, WordNavigationType.WordEnd),
+			WordOperations.moveWordRight(wordSeparators, model, position, WordNavigationType.WordStart, locales),
+			WordOperations.moveWordRight(wordSeparators, model, position, WordNavigationType.WordEnd, locales),
 			WordOperations._moveWordPartRight(model, position)
 		]);
 		candidates.sort(Position.compare);
