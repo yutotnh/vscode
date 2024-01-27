@@ -48,7 +48,7 @@ export abstract class MoveWordCommand extends EditorCommand {
 		const wordSeparators = getMapForWordSeparators(editor.getOption(EditorOption.wordSeparators));
 		const model = editor.getModel();
 		const selections = editor.getSelections();
-		const locales = editor.getOption(EditorOption.wordSeparators);
+		const locales = editor.getOption(EditorOption.recognizeWordLocales);
 
 		const result = selections.map((sel) => {
 			const inPosition = new Position(sel.positionLineNumber, sel.positionColumn);
@@ -84,17 +84,17 @@ export abstract class MoveWordCommand extends EditorCommand {
 		}
 	}
 
-	protected abstract _move(wordSeparators: WordCharacterClassifier, model: ITextModel, position: Position, wordNavigationType: WordNavigationType, locales: string): Position;
+	protected abstract _move(wordSeparators: WordCharacterClassifier, model: ITextModel, position: Position, wordNavigationType: WordNavigationType, locales: string[]): Position;
 }
 
 export class WordLeftCommand extends MoveWordCommand {
-	protected _move(wordSeparators: WordCharacterClassifier, model: ITextModel, position: Position, wordNavigationType: WordNavigationType, locales: string): Position {
+	protected _move(wordSeparators: WordCharacterClassifier, model: ITextModel, position: Position, wordNavigationType: WordNavigationType, locales: string[]): Position {
 		return WordOperations.moveWordLeft(wordSeparators, model, position, wordNavigationType, locales);
 	}
 }
 
 export class WordRightCommand extends MoveWordCommand {
-	protected _move(wordSeparators: WordCharacterClassifier, model: ITextModel, position: Position, wordNavigationType: WordNavigationType, locales: string): Position {
+	protected _move(wordSeparators: WordCharacterClassifier, model: ITextModel, position: Position, wordNavigationType: WordNavigationType, locales: string[]): Position {
 		return WordOperations.moveWordRight(wordSeparators, model, position, wordNavigationType, locales);
 	}
 }
@@ -188,7 +188,7 @@ export class CursorWordAccessibilityLeft extends WordLeftCommand {
 		});
 	}
 
-	protected override _move(_: WordCharacterClassifier, model: ITextModel, position: Position, wordNavigationType: WordNavigationType, locales: string): Position {
+	protected override _move(_: WordCharacterClassifier, model: ITextModel, position: Position, wordNavigationType: WordNavigationType, locales: string[]): Position {
 		return super._move(getMapForWordSeparators(EditorOptions.wordSeparators.defaultValue), model, position, wordNavigationType, locales);
 	}
 }
@@ -203,7 +203,7 @@ export class CursorWordAccessibilityLeftSelect extends WordLeftCommand {
 		});
 	}
 
-	protected override _move(_: WordCharacterClassifier, model: ITextModel, position: Position, wordNavigationType: WordNavigationType, locales: string): Position {
+	protected override _move(_: WordCharacterClassifier, model: ITextModel, position: Position, wordNavigationType: WordNavigationType, locales: string[]): Position {
 		return super._move(getMapForWordSeparators(EditorOptions.wordSeparators.defaultValue), model, position, wordNavigationType, locales);
 	}
 }
@@ -296,7 +296,7 @@ export class CursorWordAccessibilityRight extends WordRightCommand {
 		});
 	}
 
-	protected override _move(_: WordCharacterClassifier, model: ITextModel, position: Position, wordNavigationType: WordNavigationType, locales: string): Position {
+	protected override _move(_: WordCharacterClassifier, model: ITextModel, position: Position, wordNavigationType: WordNavigationType, locales: string[]): Position {
 		return super._move(getMapForWordSeparators(EditorOptions.wordSeparators.defaultValue), model, position, wordNavigationType, locales);
 	}
 }
@@ -311,7 +311,7 @@ export class CursorWordAccessibilityRightSelect extends WordRightCommand {
 		});
 	}
 
-	protected override _move(_: WordCharacterClassifier, model: ITextModel, position: Position, wordNavigationType: WordNavigationType, locales: string): Position {
+	protected override _move(_: WordCharacterClassifier, model: ITextModel, position: Position, wordNavigationType: WordNavigationType, locales: string[]): Position {
 		return super._move(getMapForWordSeparators(EditorOptions.wordSeparators.defaultValue), model, position, wordNavigationType, locales);
 	}
 }
@@ -355,7 +355,8 @@ export abstract class DeleteWordCommand extends EditorCommand {
 				autoClosingBrackets,
 				autoClosingQuotes,
 				autoClosingPairs,
-				autoClosedCharacters: viewModel.getCursorAutoClosedCharacters()
+				autoClosedCharacters: viewModel.getCursorAutoClosedCharacters(),
+				recognizeWordLocales: editor.getOption(EditorOption.recognizeWordLocales)
 			}, this._wordNavigationType);
 			return new ReplaceCommand(deleteRange, '');
 		});
@@ -486,9 +487,10 @@ export class DeleteInsideWord extends EditorAction {
 		const wordSeparators = getMapForWordSeparators(editor.getOption(EditorOption.wordSeparators));
 		const model = editor.getModel();
 		const selections = editor.getSelections();
+		const locales = editor.getOption(EditorOption.recognizeWordLocales);
 
 		const commands = selections.map((sel) => {
-			const deleteRange = WordOperations.deleteInsideWord(wordSeparators, model, sel);
+			const deleteRange = WordOperations.deleteInsideWord(wordSeparators, model, sel, locales);
 			return new ReplaceCommand(deleteRange, '');
 		});
 

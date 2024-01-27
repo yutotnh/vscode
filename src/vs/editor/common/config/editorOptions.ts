@@ -163,9 +163,8 @@ export interface IEditorOptions {
 	/**
 	 * Locales that recognizes word separators when doing word related navigations or operations.
 	 *
-	 * Specify the BCP 47 language tag of the word you wish to recognize. If you specify more than one, separate them with a space.
-	 * The default setting of "" does not recognize words.
-	 * If "auto" is specified, Use VS Code's configured display language.
+	 * Specify the BCP 47 language tag of the word you wish to recognize. If you specify more than one, separate them with a comma.
+	 * The default setting of blank will not recognize words.
 	 */
 	recognizeWordLocales?: string;
 	/**
@@ -3572,6 +3571,50 @@ class ReadonlyMessage extends BaseEditorOption<EditorOption.readOnlyMessage, IMa
 
 //#endregion
 
+//#region readonly
+
+/**
+ * Locales that recognizes word separators when doing word related navigations or operations.
+ *
+ * Specify the BCP 47 language tag of the word you wish to recognize. If you specify more than one, separate them with a comma.
+ * The default setting of blank will not recognize words.
+ */
+class RecognizeWordLocales extends BaseEditorOption<EditorOption.recognizeWordLocales, string, string[]> {
+	constructor() {
+		const defaults: string[] = [];
+
+		super(
+			EditorOption.recognizeWordLocales, 'recognizeWordLocales', defaults,
+			{
+				type: 'string',
+				description: nls.localize('recognizeWordLocales', "Locales that recognize words when doing word related navigations or operations.Specify the BCP 47 language tag of the word you wish to recognize. If you specify more than one, separate them with a comma.The default setting of blank will not recognize words."),
+			}
+		);
+	}
+
+	public validate(input: any): string[] {
+		if (typeof input === 'string') {
+			const input_locales = input.split(',').map((item) => item.trim());
+			const valid_locales: string[] = [];
+			for (const locale of input_locales) {
+				try {
+					if (Intl.Segmenter.supportedLocalesOf(locale).length > 0) {
+						valid_locales.push(locale);
+					}
+				} catch (_) {
+					// ignore invalid locales
+				}
+			}
+			return valid_locales;
+		}
+
+		return this.defaultValue;
+	}
+}
+
+
+//#endregion
+
 //#region scrollbar
 
 /**
@@ -5706,10 +5749,7 @@ export const EditorOptions = {
 		EditorOption.readOnly, 'readOnly', false,
 	)),
 	readOnlyMessage: register(new ReadonlyMessage()),
-	recognizeWordLocale: register(new EditorStringOption(
-		EditorOption.recognizeWordLocales, 'recognizeWordLocales', USUAL_WORD_SEPARATORS,
-		{ description: nls.localize('recognizeWordLocale', "Locales that recognizes word separators when doing word related navigations or operations.Specify the BCP 47 language tag of the word you wish to recognize. If you specify more than one, separate them with a space. The default setting of \"\" does not recognize words. If \"auto\" is specified, Use VS Code's configured display language.") }
-	)),
+	recognizeWordLocales: register(new RecognizeWordLocales()),
 	renameOnType: register(new EditorBooleanOption(
 		EditorOption.renameOnType, 'renameOnType', false,
 		{ description: nls.localize('renameOnType', "Controls whether the editor auto renames on type."), markdownDeprecationMessage: nls.localize('renameOnTypeDeprecate', "Deprecated, use `editor.linkedEditing` instead.") }
