@@ -3576,7 +3576,7 @@ class ReadonlyMessage extends BaseEditorOption<EditorOption.readOnlyMessage, IMa
 /**
  * Locales that recognizes word separators when doing word related navigations or operations.
  *
- * Specify the BCP 47 language tag of the word you wish to recognize. If you specify more than one, separate them with a comma.
+ * Specify the BCP 47 language tag of the word you wish to recognize (e.g., ja, zh-CN, zh-Hant-TW, etc.). If you specify more than one, separate them with a comma.
  * The default setting of blank will not recognize words.
  */
 class RecognizeWordLocales extends BaseEditorOption<EditorOption.recognizeWordLocales, string, string[]> {
@@ -3587,7 +3587,7 @@ class RecognizeWordLocales extends BaseEditorOption<EditorOption.recognizeWordLo
 			EditorOption.recognizeWordLocales, 'recognizeWordLocales', defaults,
 			{
 				type: 'string',
-				description: nls.localize('recognizeWordLocales', "Locales that recognize words when doing word related navigations or operations.Specify the BCP 47 language tag of the word you wish to recognize. If you specify more than one, separate them with a comma.The default setting of blank will not recognize words."),
+				description: nls.localize('recognizeWordLocales', "Locales that recognize words when doing word related navigations or operations.Specify the BCP 47 language tag of the word you wish to recognize (e.g., ja, zh-CN, zh-Hant-TW, etc.). If you specify more than one, separate them with a comma.The default setting of blank will not recognize words."),
 			}
 		);
 	}

@@ -3193,7 +3193,7 @@ declare namespace monaco.editor {
 		 * Specify the BCP 47 language tag of the word you wish to recognize. If you specify more than one, separate them with a comma.
 		 * The default setting of blank will not recognize words.
 		 */
-		recognizeWordLocales?: string[];
+		recognizeWordLocales?: string;
 		/**
 		 * Should the textarea used for input use the DOM `readonly` attribute.
 		 * Defaults to false.
@@ -5033,7 +5033,7 @@ declare namespace monaco.editor {
 		quickSuggestionsDelay: IEditorOption<EditorOption.quickSuggestionsDelay, number>;
 		readOnly: IEditorOption<EditorOption.readOnly, boolean>;
 		readOnlyMessage: IEditorOption<EditorOption.readOnlyMessage, any>;
-		recognizeWordLocales: IEditorOption<EditorOption.recognizeWordLocales, string[]>;
+		recognizeWordLocales: IEditorOption<EditorOption.recognizeWordLocales, {}>;
 		renameOnType: IEditorOption<EditorOption.renameOnType, boolean>;
 		renderControlCharacters: IEditorOption<EditorOption.renderControlCharacters, boolean>;
 		renderFinalNewline: IEditorOption<EditorOption.renderFinalNewline, 'on' | 'off' | 'dimmed'>;
